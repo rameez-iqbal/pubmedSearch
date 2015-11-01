@@ -4,199 +4,33 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<title>Med Search</title>
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-		<style>
-			.axis path {
-				fill: none;
-				stroke: #777;
-				shape-rendering: crispEdges;
-			}
-			.axis text {
-				font-family: Lato;
-				font-size: 13px;
-			}
-		</style>
+		<link rel="stylesheet" href="static/medsearch.css">
 		<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 		<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-		<script>
-			$(function() {
-				$( "#start_date, #end_date" ).datepicker({
-					dateFormat: "yy/mm/dd"
-					});
-			});
-  
-			$(function() {
-				$( "#search" ).click(function() {
-
-				var terms      = $("#terms").val();
-				var start_date = $("#start_date").val();
-				var end_date   = $("#end_date").val();
-
-				 $.ajax({
-						type: "GET",
-						url: "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed",
-						data: {'term':terms,'datetype':'pdat','mindate':start_date,'maxdate':end_date,'retmax':'5','retmode':'json'},
-						dataType: "json",
-						success: esearch_response,
-						error: function(req, response) {
-							alert("Error:" + response);
-						}
-					}); // End Ajax
-
-				}); // End search Click
-			});
-			
-			function esearch_response (response) {
-
-
-				var count      = response.esearchresult.count;
-				var id_list    = response.esearchresult.idlist.toString();
-				var start_date = $("#start_date").val();
-				var end_date   = $("#end_date").val();
-
-				var d = new Date(start_date);
-				var start_year = d.getFullYear();
-
-				var d = new Date(end_date);
-				var end_year = d.getFullYear();
-
-				 $.ajax({
-						type: "GET",
-						url: "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/epost.fcgi?db=pubmed",
-						data: {'id':id_list},
-						dataType: "xml",
-						success: epost_response,
-						error: function(req, response) {
-							alert("Error:" + response);
-						}
-					}); // End Ajax
-
-			}
-
-		function epost_response (xml) {
-			var web_env   = $(xml).find("WebEnv").text();
-			var query_key = $(xml).find("QueryKey").text();
-console.log(web_env);
-
-			$.ajax({
-				type: "GET",
-				url: "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed",
-				data: {'WebEnv':web_env,'query_key':query_key,'retmode':'json'},
-				dataType: "json",
-				success: esummary_response,
-				error: function(req, response) {
-					alert("Error:" + response);
-				}
-			}); // End Ajax
-		}
-
-		function esummary_response (response) {
-
-			var uids = response.result.uids;
-			console.log(uids);
-			console.log(response.result);
-			//console.log(response.result."26517722");
-			uids.forEach(function(uid) {
-				console.log(uid);
-				console.log(response.result[uid].pubdate);
-				year = response.result[uid].pubdate.match(/\d{4}/);
-				console.log("year = " + year);
-			});
-
-			
-			//make_chart();
-		}
-
-
-function make_chart() {
-  var barData = [{
-    'x': 1,
-    'y': 5
-  }, {
-    'x': 20,
-    'y': 20
-  }, {
-    'x': 40,
-    'y': 10
-  }, {
-    'x': 60,
-    'y': 40
-  }, {
-    'x': 80,
-    'y': 5
-  }, {
-    'x': 100,
-    'y': 60
-  }];
-
-barData.push({'x': 200,'y':80});
-
-	var bar_chart = d3.select('#bar_chart'),
-	WIDTH = 500,
-	HEIGHT = 500,
-	MARGINS = {
-	  top: 20,
-	  right: 20,
-	  bottom: 20,
-	  left: 50
-	},
-	xRange = d3.scale.ordinal().rangeRoundBands([MARGINS.left, WIDTH - MARGINS.right], 0.1).domain(barData.map(function (d) {
-	  return d.x;
-	})),
-	yRange = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0,
-	  d3.max(barData, function (d) {
-		return d.y;
-	  })
-	]),
-
-	xAxis = d3.svg.axis()
-	  .scale(xRange)
-	  .tickSize(5)
-	  .tickSubdivide(true),
-
-	yAxis = d3.svg.axis()
-	  .scale(yRange)
-	  .tickSize(5)
-	  .orient("left")
-	  .tickSubdivide(true);
-
-
-	bar_chart.append('svg:g')
-	.attr('class', 'x axis')
-	.attr('transform', 'translate(0,' + (HEIGHT - MARGINS.bottom) + ')')
-	.call(xAxis);
-
-	bar_chart.append('svg:g')
-	.attr('class', 'y axis')
-	.attr('transform', 'translate(' + (MARGINS.left) + ',0)')
-	.call(yAxis);
-
-	bar_chart.selectAll('rect')
-	.data(barData)
-	.enter()
-	.append('rect')
-	.attr('x', function (d) {
-	  return xRange(d.x);
-	})
-	.attr('y', function (d) {
-	  return yRange(d.y);
-	})
-	.attr('width', xRange.rangeBand())
-	.attr('height', function (d) {
-	  return ((HEIGHT - MARGINS.bottom) - yRange(d.y));
-	})
-	.attr('fill', 'grey');
-}
-		</script>
-
+		<script src="static/spin.min.js"></script>
+		<script src="static/util.js"></script>
 	</head>
-	
+
 	<body>
-		<input type="text" name="terms" id="terms"/>
-		<p>Start Date: <input type="text" id="start_date"></p>
-		<p>End Date: <input type="text" id="end_date"></p>
-		<input type="button" name="search" id="search" value="Search">
-		
+
+		<div id="top">
+			<label>Terms </label><input type="text" name="terms" id="terms"/>
+			<div>
+				<label>Start Date </label><input type="text" id="start_date">
+				<label>End Date </label><input type="text" id="end_date">
+			</div>
+			<input type="button" name="search" id="search" value="Search">
+		</div>
+		<div id="barchart">
+			<div><svg id="bar_chart" width="1000" height="500"></svg></div>
+		</div>
+		<div id="otherdata">
+		</div>
 		<div><svg id="bar_chart" width="1000" height="500"></svg></div>
+		<div id="fade"></div>
+		<div id="modal">
+			<img id="loader" src="images/loading.gif" />
+		</div>
 	</body>
 </html>

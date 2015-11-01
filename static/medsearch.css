@@ -1,0 +1,68 @@
+#top {
+	margin: 20px 20px 0px 20px;
+	padding: 10px;
+	height: 70px;
+	text-align:center;
+	}
+
+#barchart {
+	margin: 40px 40px 40px 20px;
+	width:500px;
+	height:500px;
+	}
+
+#otherdata {
+	position: absolute;
+	top: 130px;
+	left: 600px;
+	margin: 20px;
+	width: 500px;
+	height:500px;
+	}
+
+#terms {
+	width:300px;
+}
+
+/* Bar chart css */
+.axis path {
+	fill: none;
+	stroke: #777;
+	shape-rendering: crispEdges;
+}
+.axis text {
+	font-family: Lato;
+	font-size: 13px;
+}
+
+/* Spinning Modal css */
+#fade {
+	display: none;
+	position:absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: #ababab;
+	z-index: 1001;
+	-moz-opacity: 0.8;
+	opacity: .70;
+	filter: alpha(opacity=80);
+}
+
+#modal {
+	display: none;
+	position: absolute;
+	top: 45%;
+	left: 45%;
+	width: 64px;
+	height: 64px;
+	padding:30px 15px 0px;
+	border: 3px solid #ababab;
+	box-shadow:1px 1px 10px #ababab;
+	border-radius:20px;
+	background-color: white;
+	z-index: 1002;
+	text-align:center;
+	overflow: auto;
+}
