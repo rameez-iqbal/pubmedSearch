@@ -113,6 +113,8 @@ function esummary_response (response) {
 
 	if (pub_count > retmax) {
 		$("#message").text( "Your search returned more than "+retmax+" records. Returning first "+retmax+" only. Refine your search or increase retmax value to try loading more data." );
+	} else {
+		$("#message").text("");
 	}
 
 	//Hide spinning modal
