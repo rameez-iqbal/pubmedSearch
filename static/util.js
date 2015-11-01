@@ -1,5 +1,7 @@
-var tool = "rameeztest",
+var tool  = "rameeztest",
 	email = "rameez.iqbal@outlook.com";
+var retmax = 200;
+var pub_count;
 
 $(function() {
 	$( "#start_date, #end_date" ).datepicker({
@@ -17,7 +19,7 @@ $(function() {
 		 $.ajax({
 				type: "GET",
 				url: "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed",
-				data: {'term':terms,'datetype':'pdat','mindate':start_date,'maxdate':end_date,'retmax':'200','retmode':'json','tool':tool,'email':email},
+				data: {'term':terms,'datetype':'pdat','mindate':start_date,'maxdate':end_date,'retmax':retmax,'retmode':'json','tool':tool,'email':email},
 				dataType: "json",
 				success: esearch_response,
 				error: function(req, response) {
@@ -32,7 +34,14 @@ $(function() {
 // Get list of UIDs from esearch result and pass on to epost
 function esearch_response (response) {
 
-	var count      = response.esearchresult.count;
+	pub_count = response.esearchresult.count;
+
+	if (pub_count == 0) {
+		closeModal();
+		$("#message").text( "No data Found" );
+		return;
+	}
+
 	var id_list    = response.esearchresult.idlist.toString();
 	var start_date = $("#start_date").val();
 	var end_date   = $("#end_date").val();
@@ -101,6 +110,10 @@ function esummary_response (response) {
 		year_count.push({'year': i,'count':count[i]});
 
 	make_chart(year_count);
+
+	if (pub_count > retmax) {
+		$("#message").text( "Your search returned more than "+retmax+" records. Returning first "+retmax+" only. Refine your search or increase retmax value to try loading more data." );
+	}
 
 	//Hide spinning modal
 	closeModal();
